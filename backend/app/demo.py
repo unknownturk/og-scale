@@ -1,0 +1,28 @@
+"""Beispieldaten für den Demo-Speicher (nur mit DEMO_SEED=1, nie in Airtable)."""
+
+from .store import MODELS, NICHES
+
+
+def seed(store):
+    if store.kind != "memory" or store.list(MODELS):
+        return
+    lena = store.create(MODELS, {"name": "Lena Hartmann", "vibe": "Sportliche Blondine aus München, frech, nahbar, lacht viel.", "language": "German", "market": "DE", "notes": ""})
+    store.create(MODELS, {"name": "Mia Carter", "vibe": "Sun-kissed California girl, confident and playful.", "language": "English", "market": "US", "notes": ""})
+    base = {"modelId": lena["id"], "market": "DE", "source": "AI", "themes": [], "alwaysInclude": "", "dressCode": "", "nsfwLevel": "sfw"}
+    store.create(NICHES, {**base, "name": "Tankstelle bei Nacht", "status": "Approved", "styleVibe": "Neonlicht, nasser Asphalt, filmisch",
+        "outfits": ["ein kurzes Jeanskleid mit Gürtel", "Hotpants mit geknotetem Crop-Top", "ein enges Minikleid in Rot", "Sport-BH mit Radlerhose", "ein Slipdress mit Lederjacke"],
+        "backgrounds": ["eine Zapfsäule unter Neonröhren", "der Shop mit Kühlregal", "ein Parkplatz im Regen"],
+        "scenarios": [{"name": "Tanken", "setting": "Zapfsäule", "action": "lehnt am Auto und schaut über die Schulter"}],
+        "hooks": ["POV: Du wolltest nur kurz tanken", "Wer zahlt heute meinen Tank? 😇"]})
+    store.create(NICHES, {**base, "name": "Notaufnahme-Schicht", "status": "Proposed", "dressCode": "authentic", "alwaysInclude": "echte Klinik-Kasacks, Krankenhausumgebung", "styleVibe": "helles Kliniklicht, dokumentarisch",
+        "outfits": ["ein blauer Kasack mit Namensschild", "ein grüner OP-Kittel mit Haube", "ein weißer Kasack mit Stethoskop"],
+        "backgrounds": ["ein Stationsflur", "ein Schwesternzimmer mit Monitoren", "ein Behandlungsraum"],
+        "scenarios": [{"name": "Übergabe", "setting": "Schwesternzimmer", "action": "blättert in der Akte und zwinkert"}],
+        "hooks": ["Deine Nachtschwester hat heute Geduld", "POV: Ich messe deinen Puls"]})
+    store.create(NICHES, {**base, "name": "Gym Girl", "status": "Proposed", "styleVibe": "kühles Studiolicht, Spiegel, dynamisch",
+        "outfits": ["ein Set aus Sport-BH und Shorts in Salbei", "Leggings mit bauchfreiem Top", "ein Einteiler mit Rückenausschnitt", "Radlerhose mit Bandeau"],
+        "backgrounds": ["der Freihantelbereich", "eine Spiegelwand", "die Umkleide"],
+        "scenarios": [{"name": "Squat", "setting": "Rack", "action": "richtet den Zopf und grinst in den Spiegel"}],
+        "hooks": ["Trainierst du mit mir?", "Er meinte, er spottet nur 🙄"]})
+    store.create(NICHES, {**base, "name": "Büro nach Feierabend", "status": "Rejected", "styleVibe": "warmes Schreibtischlicht",
+        "outfits": ["ein Bleistiftrock mit Bluse"], "backgrounds": ["ein leeres Großraumbüro"], "scenarios": [], "hooks": []})
