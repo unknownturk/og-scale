@@ -15,17 +15,39 @@ Next.js (frontend/)  ──Proxy──>  FastAPI (backend/)  ──>  Airtable (
 |---|---|
 | Anmeldung, Grundgerüst, Design | fertig |
 | Models und Nischen | fertig |
-| Content: Referenzfotos, Carousels, Fotos | fertig |
-| Content: Motion-Reels (Vorlage, Bild, Freigabe, Video mit Ton) | fertig |
 | Viral: Quellen, Lesen, Bewertung, Import in Motion-Reels | fertig |
-| Content: Untertitel und Captions für Reels | noch nicht gebaut |
-| AliRemote | noch nicht gebaut |
+| Content: Referenzfotos, Carousels, Fotos, Motion-Reels | fertig |
+| AliRemote: Accounts, Kurswahl, Plan, Tresor, Ausführung, Not-Stopp | fertig |
+| Untertitel für Reels, Storys über AliRemote | nicht gebaut |
 
-Noch nicht gegen die echten Dienste geprüft: Airtable, OpenRouter, Kie, HikerAPI
-und Apify sind nur gegen nachgestellte Antworten getestet. Mit `MEDIA_PROVIDER=fake` entstehen
-kostenlose Platzhalter-Bilder zum Ausprobieren.
+**Noch nie gegen die echten Dienste gelaufen.** Airtable, OpenRouter, Kie,
+HikerAPI, Apify und AliRemote sind nur gegen nachgestellte Antworten getestet.
+Mit `MEDIA_PROVIDER=fake` läuft alles kostenlos mit Platzhaltern und
+nachgestellten Handys.
 
-Der Server braucht `ffmpeg` und `ffprobe` (für Motion-Reels).
+## Einrichten für den echten Betrieb
+
+Backend (`backend/.env` oder Umgebung des Servers):
+
+| Variable | Wofür |
+|---|---|
+| `BACKEND_API_KEY` | gemeinsames Geheimnis mit dem Frontend (frei wählbar, lang) |
+| `AIRTABLE_API_KEY`, `AIRTABLE_BASE_ID` | neue, leere Base; danach `python -m scripts.create_schema` |
+| `DATABASE_URL` | Postgres für Aufträge und den AliRemote-Plan |
+| `OPENROUTER_API_KEY` | Nischen |
+| `KIE_API_KEY` | Bilder und Videos |
+| `HIKERAPI_TOKEN` oder `APIFY_TOKEN` | Viral |
+| `ALIREMOTE_TOKEN` | AliRemote |
+| `PUBLIC_URL`, `CORS_ORIGINS` | Adresse des Backends, Adresse des Frontends |
+
+Frontend (`frontend/.env.local`): `BACKEND_URL`, `BACKEND_API_KEY`, `APP_PASSWORD`, `AUTH_SECRET`.
+
+Das Backend läuft als **ein** Prozess (`backend/Dockerfile`): Aufträge und der
+AliRemote-Takt leben darin. Nicht mit mehreren Workern starten.
+
+Erster echter AliRemote-Lauf: einen Test-Account planen, »Account erstellt«
+bestätigen, Automatik einschalten und den ersten Warm-up am Handy beobachten.
+Die Automations-Kennungen stehen in `app/settings.py` (`ALI_*_AUTOMATION`).
 
 ## Lokal starten
 

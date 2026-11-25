@@ -19,7 +19,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
           <Link href="/" aria-current={onModels ? "page" : undefined}><span className="lang">Models &amp; Nischen</span><span className="kurz">Models</span></Link>
           <Link href="/viral" aria-current={path.startsWith("/viral") ? "page" : undefined}>Viral</Link>
           <Link href="/content" aria-current={path.startsWith("/content") ? "page" : undefined}>Content</Link>
-          <span className="bald">AliRemote <em>in Arbeit</em></span>
+          <Link href="/aliremote" aria-current={path.startsWith("/aliremote") ? "page" : undefined}>AliRemote</Link>
         </nav>
         <div className="unten">
           <button onClick={logout}>Abmelden</button>

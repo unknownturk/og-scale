@@ -45,6 +45,17 @@ CORS_ORIGINS = [
 ]
 DEMO_SEED = _flag("DEMO_SEED")
 
+# AliRemote: ferngesteuerte iPhones. Die drei Automationen liegen fertig bei
+# AliRemote; der Hub startet sie nur per Kennung.
+ALIREMOTE_TOKEN = os.getenv("ALIREMOTE_TOKEN", "")
+ALI_WARMUP_AUTOMATION = os.getenv("ALI_WARMUP_AUTOMATION", "b0a1a7d3-49cc-4c0b-939e-d92a0b457e46")
+ALI_REEL_AUTOMATION = os.getenv("ALI_REEL_AUTOMATION", "8693fd37-51cd-42ca-ad6f-fb7e0896dfc6")
+ALI_STATUS_AUTOMATION = os.getenv("ALI_STATUS_AUTOMATION", "280d8b06-b017-4a96-acb5-0746067abb30")
+ALI_SEND_CAPTION = _flag("ALI_SEND_CAPTION", "1")
+MAX_ACCOUNTS_PER_PHONE = 3
+ALI_COURSE_DAYS = 7
+ALI_TICK_SECONDS = int(os.getenv("ALI_TICK_SECONDS", "60"))
+
 # Eine Zeitzone für die ganze App — nie datetime.now() ohne sie.
 TIMEZONE = ZoneInfo("Europe/Berlin")
 

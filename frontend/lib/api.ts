@@ -1,4 +1,4 @@
-import type { Content, Job, Model, Niche, NicheSpec, NicheStatus, PhotoMode, Source } from "./types";
+import type { AliOverview, Content, Job, Model, Niche, NicheSpec, NicheStatus, PhotoMode, Source } from "./types";
 
 export class ApiError extends Error {
   constructor(public status: number, message: string) {
@@ -61,6 +61,14 @@ export const api = {
   setViralStatus: (id: string, status: "New" | "Dismissed") => req<unknown>(`/viral/reels/${id}/status`, post({ status })),
   importViral: (viralIds: string[], nicheId: string, variants: number, videoModel: "kling-3.0" | "kling-2.6") =>
     req<{ count: number }>("/viral/import", post({ viralIds, nicheId, variants, videoModel })),
+  aliAddAccount: (username: string, nicheId: string, deviceId: string) => req<AliOverview>("/ali/accounts", post({ username, nicheId, deviceId })),
+  aliCreated: (id: string, course: string) => req<AliOverview>(`/ali/accounts/${id}/created`, post({ course })),
+  aliArmed: (id: string, armed: boolean) => req<AliOverview>(`/ali/accounts/${id}/armed`, post({ armed })),
+  aliRemove: (id: string) => req<AliOverview>(`/ali/accounts/${id}`, { method: "DELETE" }),
+  aliStop: (stopped: boolean) => req<AliOverview>("/ali/stop", post({ stopped })),
+  aliResolve: (slotId: string, outcome: "happened" | "not_happened") => req<AliOverview>(`/ali/slots/${slotId}/resolve`, post({ outcome })),
+  aliReplan: (slotId: string) => req<AliOverview>(`/ali/slots/${slotId}/replan`, post()),
+  aliSkip: (slotId: string) => req<AliOverview>(`/ali/slots/${slotId}/skip`, post()),
   uploadVideo: (file: File) => {
     const form = new FormData();
     form.append("file", file);

@@ -398,3 +398,50 @@ video.gross { display: block; max-width: 100%; max-height: 68dvh; margin: 0 auto
   .leiste .kurz { display: inline; }
   .auswahl { bottom: 84px; border-radius: 22px; }
 }
+
+/* --- AliRemote -------------------------------------------------------------- */
+.kennzahlen { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-bottom: 8px; }
+.kennzahlen .karte { padding: 18px 20px; display: grid; gap: 2px; }
+.kennzahlen b { font-family: var(--titel); font-size: 2.2rem; line-height: 1; }
+.kennzahlen span { color: var(--text-leise); font-size: 0.9rem; }
+.kennzahlen .braucht { border-color: rgba(255, 208, 74, 0.55); }
+.t-cyan { color: var(--cyan); } .t-mint { color: var(--mint); } .t-gelb { color: var(--gelb); }
+.offen { padding: 18px 22px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 24px; }
+.offen > div:first-child { min-width: 0; flex: 1 1 320px; }
+.offen h3 { font-size: 1.1rem; }
+.offen.s-uncertain { border-color: rgba(255, 208, 74, 0.6); }
+.offen.s-failed, .offen.s-missed { border-color: rgba(255, 107, 107, 0.55); }
+.konto { padding: 22px 24px; display: grid; gap: 16px; }
+.konto.an { border-color: rgba(63, 240, 180, 0.45); }
+.konto .vorrat b { color: var(--mint); }
+/* Der Tageslauf: jeder Schritt des Kurses als kleines Zeitfeld, Tag für Tag. */
+.lauf { display: grid; gap: 8px; }
+.lauf-tag { display: grid; grid-template-columns: 92px 1fr; gap: 10px; align-items: center; }
+.lauf-datum { font-size: 0.82rem; color: var(--text-leise); white-space: nowrap; }
+.lauf-schritte { display: flex; flex-wrap: wrap; gap: 6px; }
+.schritt {
+  display: inline-block; font-size: 0.78rem; font-variant-numeric: tabular-nums; padding: 3px 9px; border-radius: 8px;
+  border: 1px solid; font-style: normal;
+}
+.schritt.k-warmup, .schritt.k-native_warmup { background: rgba(139, 108, 255, 0.2); border-color: rgba(139, 108, 255, 0.6); }
+.schritt.k-reel { background: rgba(255, 79, 163, 0.2); border-color: rgba(255, 79, 163, 0.65); }
+.schritt.k-status { background: rgba(63, 216, 255, 0.14); border-color: rgba(63, 216, 255, 0.5); }
+.schritt.leer { background: transparent; border-style: dashed; color: var(--text-leise); }
+.schritt.s-done, .schritt.s-posted { background: rgba(63, 240, 180, 0.85); border-color: var(--mint); color: #06281d; font-weight: 600; }
+.schritt.s-running, .schritt.s-dispatching { background: var(--cyan); border-color: var(--cyan); color: #04202b; font-weight: 600; }
+.schritt.s-uncertain { background: var(--gelb); border-color: var(--gelb); color: #2d2200; font-weight: 600; }
+.schritt.s-failed, .schritt.s-missed { background: rgba(255, 107, 107, 0.85); border-color: var(--rot); color: #2a0707; font-weight: 600; }
+.schritt.s-cancelled { opacity: 0.35; text-decoration: line-through; }
+.legende { display: flex; flex-wrap: wrap; gap: 4px 6px; align-items: center; }
+.legende .schritt { width: 14px; height: 14px; padding: 0; margin-left: 10px; }
+.legende .schritt:first-child { margin-left: 0; }
+.kurse { border: 0; padding: 0; margin: 0; display: grid; gap: 10px; }
+.kurse legend { font-weight: 600; margin-bottom: 10px; padding: 0; }
+.kurs { display: flex; gap: 12px; align-items: flex-start; padding: 14px 16px; border-radius: var(--r-klein); border: 1px solid var(--kante); background: var(--glas); cursor: pointer; }
+.kurs.gewaehlt { border-color: var(--pink); background: rgba(255, 79, 163, 0.12); }
+.kurs input { margin-top: 4px; accent-color: var(--pink); width: 18px; height: 18px; flex: none; }
+.kurs span span { display: block; margin-top: 2px; font-size: 0.93rem; }
+@media (max-width: 620px) {
+  .kennzahlen { grid-template-columns: 1fr; }
+  .lauf-tag { grid-template-columns: 1fr; gap: 4px; }
+}

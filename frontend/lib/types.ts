@@ -87,3 +87,46 @@ export type ViralReel = {
 
 export type ViralStatus = { provider: string | null; lastScrape: string; running: boolean; jobId: string | null; autoHours: number };
 export type ScrapeResult = { created: number; found: number; sources: number; sourcesWithReels: number; errors: string[]; removed: number };
+
+export type AliSlot = {
+  id: string;
+  kind: "warmup" | "native_warmup" | "reel" | "status";
+  day: number;
+  ordinal: number;
+  due: string;
+  status: "planned" | "dispatching" | "running" | "done" | "posted" | "failed" | "uncertain" | "missed" | "cancelled";
+  detail: string;
+  minutes: number;
+  hasReel: boolean;
+  inVault: boolean;
+  caption: string;
+};
+
+export type AliAccount = {
+  id: string;
+  username: string;
+  modelName: string;
+  nicheName: string;
+  deviceId: string;
+  deviceName: string;
+  course: string;
+  courseName: string;
+  createdAt: string | null;
+  armed: boolean;
+  note: string;
+  reelsReady: number;
+  reelsMissing: number;
+  posted: number;
+  slots: AliSlot[];
+};
+
+export type AliOverview = {
+  connected: boolean;
+  provider: string;
+  problem: string;
+  stopped: boolean;
+  devices: { id: string; name: string; online: boolean }[];
+  accounts: AliAccount[];
+  courses: { id: string; name: string; summary: string }[];
+  maxPerPhone: number;
+};

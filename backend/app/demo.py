@@ -15,8 +15,9 @@ def seed(store):
 
         refs = [get_provider().host_file(_png(f"lena-{i}", 300, 380), "ref.png") for i in range(3)]
         store.update(MODELS, lena["id"], {"referenceImages": refs, "bodyType": "athletic"})
+    reel_niche = None
     base = {"modelId": lena["id"], "market": "DE", "source": "AI", "themes": [], "alwaysInclude": "", "dressCode": "", "nsfwLevel": "sfw"}
-    store.create(NICHES, {**base, "name": "Tankstelle bei Nacht", "status": "Approved", "styleVibe": "Neonlicht, nasser Asphalt, filmisch",
+    reel_niche = store.create(NICHES, {**base, "name": "Tankstelle bei Nacht", "status": "Approved", "styleVibe": "Neonlicht, nasser Asphalt, filmisch",
         "outfits": ["ein kurzes Jeanskleid mit Gürtel", "Hotpants mit geknotetem Crop-Top", "ein enges Minikleid in Rot", "Sport-BH mit Radlerhose", "ein Slipdress mit Lederjacke"],
         "backgrounds": ["eine Zapfsäule unter Neonröhren", "der Shop mit Kühlregal", "ein Parkplatz im Regen"],
         "scenarios": [{"name": "Tanken", "setting": "Zapfsäule", "action": "lehnt am Auto und schaut über die Schulter"}],
@@ -33,3 +34,14 @@ def seed(store):
         "hooks": ["Trainierst du mit mir?", "Er meinte, er spottet nur 🙄"]})
     store.create(NICHES, {**base, "name": "Büro nach Feierabend", "status": "Rejected", "styleVibe": "warmes Schreibtischlicht",
         "outfits": ["ein Bleistiftrock mit Bluse"], "backgrounds": ["ein leeres Großraumbüro"], "scenarios": [], "hooks": []})
+    if settings.MEDIA_PROVIDER == "fake" and reel_niche:
+        from .media.fake import _png, _silent_clip
+        from .store import CONTENT
+
+        for i in range(1, 5):  # vier freigegebene Reels als Vorrat für AliRemote
+            store.create(CONTENT, {
+                "title": f"Reel {i}: Tankstelle bei Nacht", "modelId": lena["id"], "nicheId": reel_niche["id"], "type": "Reel",
+                "status": "Approved", "step": "video", "error": "", "videoModel": "kling-3.0", "tasks": {},
+                "images": [get_provider().host_file(_png(f"reel{i}", 270, 480), "bild.png")],
+                "frame": [], "sourceVideo": [], "finalReel": [get_provider().host_file(_silent_clip(f"reel{i}"), "reel.mp4")],
+            })

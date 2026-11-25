@@ -70,6 +70,11 @@ def init(url=None):
     _Session = sessionmaker(_engine, expire_on_commit=False)
 
 
+def session():
+    """Eine Datenbank-Sitzung (auch für den AliRemote-Plan)."""
+    return _Session()
+
+
 def handler(kind, resume=False):
     """Registriert die Funktion, die einen Auftragstyp ausführt."""
 
