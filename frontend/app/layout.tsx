@@ -4,7 +4,7 @@ import "@fontsource-variable/instrument-sans";
 import "./globals.css";
 
 export const metadata: Metadata = { title: "OG Scale", robots: { index: false, follow: false } };
-export const viewport: Viewport = { width: "device-width", initialScale: 1, themeColor: "#14211d" };
+export const viewport: Viewport = { width: "device-width", initialScale: 1, themeColor: "#0a0818" };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (

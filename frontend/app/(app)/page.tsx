@@ -36,6 +36,7 @@ export default function Models() {
           const c = m.nicheCounts ?? { Proposed: 0, Approved: 0, Rejected: 0 };
           return (
             <Link key={m.id} href={`/models/${m.id}`} className="karte model">
+              <span className="kopfbild" aria-hidden="true">{m.name.trim().charAt(0).toUpperCase()}</span>
               <div>
                 <h3>{m.name}</h3>
                 <p className="leise">{m.vibe || "Noch keine Beschreibung"}</p>
