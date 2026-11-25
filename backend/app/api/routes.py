@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from .. import jobs, llm
 from ..auth import require_key
 from ..niches import service as niches
-from ..store import MODELS, NICHES, NotFound, get_store
+from ..store import CONTENT, MODELS, NICHES, NotFound, get_store
 from . import schemas
 
 router = APIRouter(dependencies=[Depends(require_key)])
@@ -73,6 +73,8 @@ def delete_model(model_id: str):
     _get(MODELS, model_id)
     if get_store().list(NICHES, {"modelId": model_id}):
         raise HTTPException(409, "Dieses Model hat noch Nischen. Lösche zuerst die Nischen.")
+    if get_store().list(CONTENT, {"modelId": model_id}):
+        raise HTTPException(409, "Dieses Model hat noch Content. Lösche zuerst den Content.")
     get_store().delete(MODELS, model_id)
 
 
@@ -124,6 +126,8 @@ def improve_niche(niche_id: str, body: schemas.ImproveIn):
 @router.delete("/niches/{niche_id}", status_code=204)
 def delete_niche(niche_id: str):
     _get(NICHES, niche_id)
+    if get_store().list(CONTENT, {"nicheId": niche_id}):
+        raise HTTPException(409, "Aus dieser Nische ist schon Content entstanden. Lehne sie ab, statt sie zu löschen.")
     get_store().delete(NICHES, niche_id)
 
 

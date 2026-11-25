@@ -2,7 +2,7 @@
 
 from .. import settings
 from .memory import MemoryStore, NotFound  # noqa: F401
-from .schema import MODELS, NICHES  # noqa: F401
+from .schema import CONTENT, MODELS, NICHES  # noqa: F401
 
 _store = None
 

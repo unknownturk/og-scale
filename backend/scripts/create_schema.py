@@ -26,6 +26,8 @@ def _field(table, key, name, kind, table_ids):
     if kind == "select":
         choices = [{"name": c} for c in SELECT_CHOICES[(table, key)]]
         return [{"name": name, "type": "singleSelect", "options": {"choices": choices}}]
+    if kind == "attach":
+        return [{"name": name, "type": "multipleAttachments"}]
     if kind == "link":
         target = table_ids[LINKS[(table, key)]]
         return [
@@ -54,8 +56,7 @@ def main():
         specs = []
         for key, (name, kind) in fields.items():
             specs += _field(table, key, name, kind, table_ids)
-        # Airtable verlangt ein Textfeld als erstes Feld.
-        specs.sort(key=lambda f: f["name"] != "Name")
+        # Das erste Feld jeder Tabelle in schema.py ist ein Textfeld (Airtable-Pflicht).
         resp = requests.post(
             url, headers=headers, json={"name": table, "fields": specs}, timeout=30
         )

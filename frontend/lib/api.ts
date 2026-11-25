@@ -1,4 +1,4 @@
-import type { Job, Model, Niche, NicheSpec, NicheStatus } from "./types";
+import type { Content, Job, Model, Niche, NicheSpec, NicheStatus, PhotoMode } from "./types";
 
 export class ApiError extends Error {
   constructor(public status: number, message: string) {
@@ -25,8 +25,13 @@ async function req<T>(path: string, init?: RequestInit): Promise<T> {
   return res.status === 204 ? (undefined as T) : res.json();
 }
 
-const post = (body?: unknown): RequestInit => ({ method: "POST", body: JSON.stringify(body ?? {}) });
-const patch = (body: unknown): RequestInit => ({ method: "PATCH", body: JSON.stringify(body) });
+const JSON_HEADERS = { "Content-Type": "application/json" };
+const post = (body?: unknown): RequestInit => ({ method: "POST", headers: JSON_HEADERS, body: JSON.stringify(body ?? {}) });
+const patch = (body: unknown): RequestInit => ({ method: "PATCH", headers: JSON_HEADERS, body: JSON.stringify(body) });
+
+/** Adresse, unter der ein gespeichertes Bild angezeigt wird. */
+export const mediaUrl = (kind: "models" | "content", id: string, field: string, index: number) =>
+  `/api/proxy/media/${kind}/${id}/${field}/${index}`;
 
 export const fetcher = <T,>(path: string) => req<T>(path);
 
@@ -41,4 +46,17 @@ export const api = {
   setNicheStatus: (id: string, status: NicheStatus) => req<Niche>(`/niches/${id}/status`, post({ status })),
   deleteNiche: (id: string) => req<void>(`/niches/${id}`, { method: "DELETE" }),
   getJob: <R,>(id: string) => req<Job<R>>(`/jobs/${id}`),
+  createImages: (nicheId: string, body: { kind: "carousel" | "photos"; count: number; mode: PhotoMode }) =>
+    req<Content[]>(`/niches/${nicheId}/content/images`, post(body)),
+  decideContent: (id: string, decision: "approve" | "reject" | "reopen") =>
+    req<Content>(`/content/${id}/decision`, post({ decision })),
+  retryContent: (id: string) => req<Content>(`/content/${id}/retry`, post()),
+  deleteContent: (id: string) => req<void>(`/content/${id}`, { method: "DELETE" }),
+  addReferences: (modelId: string, files: File[]) => {
+    const form = new FormData();
+    files.forEach((f) => form.append("files", f));
+    return req<Model>(`/models/${modelId}/references`, { method: "POST", body: form });
+  },
+  removeReference: (modelId: string, index: number) =>
+    req<Model>(`/models/${modelId}/references/${index}`, { method: "DELETE" }),
 };

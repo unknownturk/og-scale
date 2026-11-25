@@ -1,17 +1,25 @@
 """Tabellen und Felder — die eine Quelle für Speicher, Airtable-Schema und API.
 
 Jede Tabelle: app-Schlüssel -> (Airtable-Feldname, Art).
-Arten: text, long, json, select, number, link (ein verknüpfter Datensatz).
+Arten: text, long, json, select, number, link (ein verknüpfter Datensatz),
+attach (Liste von Datei-Adressen; Airtable speichert die Dateien dauerhaft).
 """
 
 MODELS = "Models"
 NICHES = "Niches"
+CONTENT = "Content"
 
 NICHE_STATUS = ("Proposed", "Approved", "Rejected")
 NICHE_SOURCE = ("AI", "Brief", "Manual")
 NSFW_LEVELS = ("sfw", "spicy", "nsfw")
 MARKETS = ("DE", "US")
 LANGUAGES = ("German", "English")
+BODY_TYPES = ("normal", "slim", "curvy", "athletic", "busty")
+CONTENT_TYPES = ("Carousel", "Photo", "Reel")
+# Ein Zustand pro Content: in Arbeit -> wartet auf dich -> freigegeben/abgelehnt.
+CONTENT_STATUS = ("Working", "Review", "Approved", "Rejected", "Failed")
+CONTENT_STEPS = ("images", "frame", "image", "video")
+PHOTO_MODES = ("niche", "lifestyle", "story_daily", "story_me", "story_cta")
 
 TABLES = {
     MODELS: {
@@ -20,6 +28,8 @@ TABLES = {
         "language": ("Language", "select"),
         "market": ("Market", "select"),
         "notes": ("Notes", "long"),
+        "bodyType": ("Body Type", "select"),
+        "referenceImages": ("Reference Images", "attach"),
     },
     NICHES: {
         "name": ("Name", "text"),
@@ -37,6 +47,20 @@ TABLES = {
         "dressCode": ("Dress Code", "text"),
         "nsfwLevel": ("NSFW Level", "select"),
     },
+    CONTENT: {
+        "title": ("Title", "text"),
+        "modelId": ("Model", "link"),
+        "nicheId": ("Niche", "link"),
+        "type": ("Type", "select"),
+        "status": ("Status", "select"),
+        "step": ("Step", "select"),
+        "mode": ("Mode", "select"),
+        "error": ("Error", "long"),
+        "prompt": ("Prompt", "long"),
+        "images": ("Images", "attach"),
+        # Quittungen der Anbieter-Aufträge: je Platz Phase, Auftragsnummer, Ergebnis.
+        "tasks": ("Tasks", "json"),
+    },
 }
 
 SELECT_CHOICES = {
@@ -46,9 +70,14 @@ SELECT_CHOICES = {
     (NICHES, "source"): NICHE_SOURCE,
     (NICHES, "market"): MARKETS,
     (NICHES, "nsfwLevel"): NSFW_LEVELS,
+    (MODELS, "bodyType"): BODY_TYPES,
+    (CONTENT, "type"): CONTENT_TYPES,
+    (CONTENT, "status"): CONTENT_STATUS,
+    (CONTENT, "step"): CONTENT_STEPS,
+    (CONTENT, "mode"): PHOTO_MODES,
 }
 
 # Verknüpfungen: (Tabelle, Schlüssel) -> Zieltabelle
-LINKS = {(NICHES, "modelId"): MODELS}
+LINKS = {(NICHES, "modelId"): MODELS, (CONTENT, "modelId"): MODELS, (CONTENT, "nicheId"): NICHES}
 
 JSON_DEFAULT = []

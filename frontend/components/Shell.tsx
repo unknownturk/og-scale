@@ -17,7 +17,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
         <div className="marke">OG <span>Scale</span></div>
         <nav aria-label="Bereiche">
           <Link href="/" aria-current={onModels ? "page" : undefined}>Models &amp; Nischen</Link>
-          <span className="bald">Content <em>in Arbeit</em></span>
+          <Link href="/content" aria-current={path.startsWith("/content") ? "page" : undefined}>Content</Link>
           <span className="bald">AliRemote <em>in Arbeit</em></span>
         </nav>
         <div className="unten">

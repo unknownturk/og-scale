@@ -32,6 +32,8 @@ export type Model = {
   language: "German" | "English";
   market: "DE" | "US";
   notes: string;
+  bodyType: "" | "normal" | "slim" | "curvy" | "athletic" | "busty";
+  referenceImages: string[];
   nicheCounts?: Record<NicheStatus, number>;
 };
 
@@ -41,4 +43,21 @@ export type Job<R = unknown> = {
   status: "queued" | "running" | "succeeded" | "failed";
   result: R | null;
   error: string;
+};
+
+export type ContentStatus = "Working" | "Review" | "Approved" | "Rejected" | "Failed";
+export type PhotoMode = "niche" | "lifestyle" | "story_daily" | "story_me" | "story_cta";
+
+export type Content = {
+  id: string;
+  title: string;
+  modelId: string;
+  nicheId: string;
+  type: "Carousel" | "Photo" | "Reel";
+  status: ContentStatus;
+  error: string;
+  images: string[];
+  imageCount: number;
+  slotCount: number;
+  created: string;
 };

@@ -17,7 +17,11 @@ class ModelIn(BaseModel):
     notes: str = Field(default="", max_length=4000)
 
 
+BodyType = Literal["normal", "slim", "curvy", "athletic", "busty"]
+
+
 class ModelPatch(BaseModel):
+    bodyType: Optional[BodyType] = None
     name: Optional[str] = Field(default=None, min_length=1, max_length=80)
     vibe: Optional[str] = Field(default=None, max_length=2000)
     language: Optional[Language] = None

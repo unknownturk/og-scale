@@ -15,11 +15,13 @@ Next.js (frontend/)  ──Proxy──>  FastAPI (backend/)  ──>  Airtable (
 |---|---|
 | Anmeldung, Grundgerüst, Design | fertig |
 | Models und Nischen | fertig |
-| Content | noch nicht gebaut |
+| Content: Referenzfotos, Carousels, Fotos | fertig |
+| Content: Motion-Reels | noch nicht gebaut |
 | AliRemote | noch nicht gebaut |
 
-Der Airtable-Client ist nur gegen einen nachgestellten Server getestet, noch
-nicht gegen eine echte Base.
+Noch nicht gegen die echten Dienste geprüft: Airtable, OpenRouter und Kie sind
+nur gegen nachgestellte Antworten getestet. Mit `MEDIA_PROVIDER=fake` entstehen
+kostenlose Platzhalter-Bilder zum Ausprobieren.
 
 ## Lokal starten
 

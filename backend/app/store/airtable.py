@@ -27,6 +27,7 @@ class AirtableStore:
         self._key = api_key or settings.AIRTABLE_API_KEY
         self._base = base_id or settings.AIRTABLE_BASE_ID
         self._http = session or requests.Session()
+        self._attachment_ids = {}  # Datei-Adresse -> Airtable-Datei-Id
 
     # --- HTTP ---------------------------------------------------------------
     def _request(self, method, url, **kwargs):
@@ -73,6 +74,12 @@ class AirtableStore:
             elif kind == "link":
                 out[name] = [value] if value else []
                 out[f"{name} Id"] = value or ""
+            elif kind == "attach":
+                # Schon gespeicherte Dateien per Id behalten, statt sie neu hochzuladen.
+                out[name] = [
+                    {"id": self._attachment_ids[url]} if url in self._attachment_ids else {"url": url}
+                    for url in (value or [])
+                ]
             else:
                 out[name] = value
         return out
@@ -89,6 +96,13 @@ class AirtableStore:
                     row[key] = []
             elif kind == "link":
                 row[key] = (raw or [None])[0]
+            elif kind == "attach":
+                row[key] = []
+                for a in raw or []:
+                    if a.get("url"):
+                        row[key].append(a["url"])
+                        if a.get("id"):
+                            self._attachment_ids[a["url"]] = a["id"]
             elif kind == "number":
                 row[key] = raw or 0
             else:

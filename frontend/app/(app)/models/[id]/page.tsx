@@ -4,6 +4,7 @@ import { use, useState } from "react";
 import useSWR from "swr";
 import { Dialog } from "@/components/Dialog";
 import { ImproveDialog, NicheCard, NicheEditor } from "@/components/niches";
+import { References } from "@/components/References";
 import { api, fetcher } from "@/lib/api";
 import type { Model, Niche, NicheStatus } from "@/lib/types";
 import { useJob } from "@/lib/useJob";
@@ -50,6 +51,8 @@ export default function ModelPage({ params }: { params: Promise<{ id: string }> 
           <button className="knopf haupt" disabled={job.running} onClick={() => setDialog("generate")}>Nischen vorschlagen lassen</button>
         </div>
       </div>
+
+      {model.data && <References model={model.data} onChanged={() => model.mutate()} />}
 
       {job.running && <div className="hinweis arbeit" role="status"><span className="reihe"><span className="puls" />{working} Das dauert bis zu zwei Minuten, du kannst hier bleiben.</span></div>}
       {job.error && <div className="hinweis fehler" role="alert">{job.error}<button className="knopf schmal" onClick={job.reset}>Schließen</button></div>}

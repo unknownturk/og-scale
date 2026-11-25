@@ -54,8 +54,10 @@ def test_rejected_key_is_not_retried(post):
     assert post == []
 
 
-def test_recover_fails_interrupted_jobs_and_resumes_resumable():
+def test_recover_fails_interrupted_jobs_and_resumes_resumable(monkeypatch):
     jobs.init("sqlite:///:memory:")
+    # Im Test sofort ausführen statt im Hintergrund, damit nichts vom Timing abhängt.
+    monkeypatch.setattr(jobs._pool, "submit", lambda fn, *a: fn(*a))
     ran = []
     jobs.handler("t_plain")(lambda p: ran.append("plain"))
     jobs.handler("t_resume", resume=True)(lambda p: ran.append("resume") or {"done": True})
@@ -64,11 +66,5 @@ def test_recover_fails_interrupted_jobs_and_resumes_resumable():
         s.add(jobs.Job(id="b", kind="t_resume", status=jobs.RUNNING))
         s.commit()
     assert jobs.recover() == {"resumed": 1, "failed": 1}
-    jobs._pool.submit(lambda: None).result()
-    import time
-    for _ in range(50):
-        if jobs.get("b")["status"] == jobs.SUCCEEDED:
-            break
-        time.sleep(0.02)
     assert jobs.get("a")["status"] == jobs.FAILED and "Neustart" in jobs.get("a")["error"]
     assert jobs.get("b")["status"] == jobs.SUCCEEDED and ran == ["resume"]

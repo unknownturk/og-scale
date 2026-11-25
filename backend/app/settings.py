@@ -19,6 +19,12 @@ AIRTABLE_API_KEY = os.getenv("AIRTABLE_API_KEY", "")
 AIRTABLE_BASE_ID = os.getenv("AIRTABLE_BASE_ID", "")
 
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY", "")
+
+# Bild- und Video-Erzeugung. "fake" erzeugt Platzhalter ohne Kosten (nur zum
+# Ausprobieren und für Tests) und ist nie die Vorgabe.
+KIE_API_KEY = os.getenv("KIE_API_KEY", "")
+MEDIA_PROVIDER = os.getenv("MEDIA_PROVIDER", "kie").strip().lower()
+PUBLIC_URL = os.getenv("PUBLIC_URL", "http://localhost:8000").rstrip("/")
 CREATIVE_MODEL = os.getenv("CREATIVE_MODEL", "openai/gpt-4o")
 
 _VAR = Path(__file__).resolve().parent.parent / "var"
@@ -34,6 +40,15 @@ TIMEZONE = ZoneInfo("Europe/Berlin")
 
 # Obergrenzen, damit ein Tippfehler kein Geld verbrennt.
 MAX_NICHES_PER_REQUEST = 6
+MAX_IMAGES_PER_REQUEST = 10
+MAX_REFERENCE_IMAGES = 6
+MAX_UPLOAD_BYTES = 12 * 1024 * 1024
+
+# Warten auf den Anbieter: Abstand zwischen zwei Abfragen und Höchstdauer.
+POLL_SECONDS = 5
+IMAGE_WAIT_SECONDS = 20 * 60
+
+FILES_DIR = _VAR / "files"
 
 
 def airtable_configured() -> bool:

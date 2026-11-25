@@ -1,5 +1,6 @@
 """Beispieldaten für den Demo-Speicher (nur mit DEMO_SEED=1, nie in Airtable)."""
 
+from . import settings
 from .store import MODELS, NICHES
 
 
@@ -8,6 +9,12 @@ def seed(store):
         return
     lena = store.create(MODELS, {"name": "Lena Hartmann", "vibe": "Sportliche Blondine aus München, frech, nahbar, lacht viel.", "language": "German", "market": "DE", "notes": ""})
     store.create(MODELS, {"name": "Mia Carter", "vibe": "Sun-kissed California girl, confident and playful.", "language": "English", "market": "US", "notes": ""})
+    if settings.MEDIA_PROVIDER == "fake":
+        from .media import get_provider
+        from .media.fake import _png
+
+        refs = [get_provider().host_file(_png(f"lena-{i}", 300, 380), "ref.png") for i in range(3)]
+        store.update(MODELS, lena["id"], {"referenceImages": refs, "bodyType": "athletic"})
     base = {"modelId": lena["id"], "market": "DE", "source": "AI", "themes": [], "alwaysInclude": "", "dressCode": "", "nsfwLevel": "sfw"}
     store.create(NICHES, {**base, "name": "Tankstelle bei Nacht", "status": "Approved", "styleVibe": "Neonlicht, nasser Asphalt, filmisch",
         "outfits": ["ein kurzes Jeanskleid mit Gürtel", "Hotpants mit geknotetem Crop-Top", "ein enges Minikleid in Rot", "Sport-BH mit Radlerhose", "ein Slipdress mit Lederjacke"],
