@@ -13,6 +13,8 @@ async function forward(request: Request, ctx: { params: Promise<{ path: string[]
   const headers: Record<string, string> = { "X-API-Key": key };
   const type = request.headers.get("content-type");
   if (hasBody) headers["Content-Type"] = type || "application/json";
+  const range = request.headers.get("range"); // Teilabrufe für Videos (iPhone)
+  if (range) headers["Range"] = range;
   try {
     const res = await fetch(url, {
       method: request.method,
@@ -23,6 +25,10 @@ async function forward(request: Request, ctx: { params: Promise<{ path: string[]
     const out = new Headers({ "Content-Type": res.headers.get("Content-Type") || "application/json" });
     const cache = res.headers.get("Cache-Control");
     if (cache) out.set("Cache-Control", cache);
+    for (const name of ["Content-Range", "Accept-Ranges"]) {
+      const value = res.headers.get(name);
+      if (value) out.set(name, value);
+    }
     return new NextResponse(res.status === 204 ? null : await res.arrayBuffer(), { status: res.status, headers: out });
   } catch {
     return NextResponse.json({ detail: "Das Backend ist nicht erreichbar" }, { status: 502 });

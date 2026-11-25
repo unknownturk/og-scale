@@ -50,7 +50,14 @@ export const api = {
     req<Content[]>(`/niches/${nicheId}/content/images`, post(body)),
   decideContent: (id: string, decision: "approve" | "reject" | "reopen") =>
     req<Content>(`/content/${id}/decision`, post({ decision })),
-  retryContent: (id: string) => req<Content>(`/content/${id}/retry`, post()),
+  retryContent: (id: string, freshImage = false) => req<Content>(`/content/${id}/retry`, post({ freshImage })),
+  createReels: (nicheId: string, sources: string[], videoModel: "kling-3.0" | "kling-2.6") =>
+    req<Content[]>(`/niches/${nicheId}/content/reels`, post({ sources, videoModel })),
+  uploadVideo: (file: File) => {
+    const form = new FormData();
+    form.append("file", file);
+    return req<{ url: string }>("/uploads/video", { method: "POST", body: form });
+  },
   deleteContent: (id: string) => req<void>(`/content/${id}`, { method: "DELETE" }),
   addReferences: (modelId: string, files: File[]) => {
     const form = new FormData();

@@ -16,12 +16,15 @@ Next.js (frontend/)  ──Proxy──>  FastAPI (backend/)  ──>  Airtable (
 | Anmeldung, Grundgerüst, Design | fertig |
 | Models und Nischen | fertig |
 | Content: Referenzfotos, Carousels, Fotos | fertig |
-| Content: Motion-Reels | noch nicht gebaut |
+| Content: Motion-Reels (Vorlage, Bild, Freigabe, Video mit Ton) | fertig |
+| Content: Untertitel und Captions für Reels | noch nicht gebaut |
 | AliRemote | noch nicht gebaut |
 
 Noch nicht gegen die echten Dienste geprüft: Airtable, OpenRouter und Kie sind
 nur gegen nachgestellte Antworten getestet. Mit `MEDIA_PROVIDER=fake` entstehen
 kostenlose Platzhalter-Bilder zum Ausprobieren.
+
+Der Server braucht `ffmpeg` und `ffprobe` (für Motion-Reels).
 
 ## Lokal starten
 

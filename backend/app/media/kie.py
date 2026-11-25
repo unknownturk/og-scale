@@ -87,6 +87,19 @@ class KieProvider:
             },
         })
 
+    def submit_video(self, prompt, image_url, video_url, model="kling-3.0") -> str:
+        """Kling Motion-Control: die Person aus dem Bild bewegt sich wie im Vorlage-Video."""
+        if model not in ("kling-3.0", "kling-2.6"):
+            raise MediaError("Unbekanntes Video-Modell")
+        inputs = {
+            "prompt": prompt, "mode": "1080p",
+            "character_orientation": "video" if model == "kling-2.6" else "image",
+            "input_urls": [image_url], "video_urls": [video_url],
+        }
+        if model == "kling-3.0":
+            inputs["background_source"] = "input_image"
+        return self._submit({"model": f"{model}/motion-control", "input": inputs})
+
     def check(self, task_id) -> dict:
         """Einmal nachsehen. Ergebnis: {"state": "waiting"|"success"|"fail", "url", "error"}.
         Verbindungsprobleme gelten als „noch nicht fertig", nie als Fehlschlag."""

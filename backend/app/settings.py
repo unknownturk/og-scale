@@ -47,6 +47,17 @@ MAX_UPLOAD_BYTES = 12 * 1024 * 1024
 # Warten auf den Anbieter: Abstand zwischen zwei Abfragen und Höchstdauer.
 POLL_SECONDS = 5
 IMAGE_WAIT_SECONDS = 20 * 60
+VIDEO_WAIT_SECONDS = 20 * 60
+
+# Motion-Reels
+FFMPEG_BIN = os.getenv("FFMPEG_BIN", "ffmpeg")
+FFPROBE_BIN = os.getenv("FFPROBE_BIN", "ffprobe")
+MAX_REELS_PER_REQUEST = 10
+MAX_SOURCE_BYTES = 200 * 1024 * 1024
+MAX_SOURCE_SECONDS = 30
+# Nur für Tests und den Platzhalter-Anbieter: Vorlagen von lokalen Adressen erlauben.
+ALLOW_PRIVATE_URLS = _flag("ALLOW_PRIVATE_URLS") or MEDIA_PROVIDER == "fake"
+WORK_DIR = _VAR / "work"
 
 FILES_DIR = _VAR / "files"
 

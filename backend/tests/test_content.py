@@ -139,7 +139,7 @@ def test_reference_upload_and_media(client, model, provider, monkeypatch):
     class Up:
         status_code, content, headers = 200, png, {"content-type": "image/png"}
 
-    monkeypatch.setattr("app.api.content.requests.get", lambda url, timeout: Up())
+    monkeypatch.setattr("app.api.content.requests.get", lambda url, **k: Up())
     assert client.get(f"/media/models/{model['id']}/referenceImages/0").content == png
     assert client.get(f"/media/models/{model['id']}/referenceImages/5").status_code == 404
     assert client.get(f"/media/models/{model['id']}/notes/0").status_code == 404

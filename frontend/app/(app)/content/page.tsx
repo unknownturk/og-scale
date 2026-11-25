@@ -39,7 +39,7 @@ export default function ContentPage() {
       <div className="kopf">
         <div>
           <h1>Content</h1>
-          <p className="leise">Carousels und Fotos aus deinen freigegebenen Nischen. Nichts gilt als fertig, bevor du es freigibst.</p>
+          <p className="leise">Carousels, Fotos und Motion-Reels aus deinen freigegebenen Nischen. Nichts gilt als fertig, bevor du es freigibst.</p>
         </div>
         <div className="reihe">
           <label className="feld filter">
@@ -59,7 +59,7 @@ export default function ContentPage() {
       {content.data?.length === 0 && (
         <div className="karte leer">
           <h2>Noch kein Content</h2>
-          <p className="leise">Wähle ein Model und eine freigegebene Nische. Daraus entstehen Carousels oder einzelne Fotos.</p>
+          <p className="leise">Wähle ein Model und eine freigegebene Nische. Daraus entstehen Carousels, einzelne Fotos oder Motion-Reels.</p>
           <button className="knopf haupt" onClick={() => setCreating(true)}>Content erzeugen</button>
         </div>
       )}
@@ -111,10 +111,34 @@ function Tile({ content, model, onChanged }: { content: Content; model: string; 
     }
   }
   const working = content.status === "Working";
-  const missing = content.slotCount - content.imageCount;
+  const reel = content.type === "Reel";
+  const missing = reel ? 0 : content.slotCount - content.imageCount;
+  const imageStep = reel && content.step !== "video";
+  const stage = !reel ? "" : working
+    ? { frame: "Vorlage wird vorbereitet", image: "Bild entsteht", video: "Video entsteht, das dauert einige Minuten", images: "" }[content.step]
+    : content.status === "Review" ? (imageStep ? "Bild prüfen" : "Video prüfen") : "";
 
   return (
     <article className={`karte kachel c-${content.status}`}>
+      {reel ? (
+        <div className="reel">
+          {content.hasVideo ? (
+            <video controls playsInline preload="metadata" src={mediaUrl("content", content.id, "finalReel", 0)} />
+          ) : content.imageCount > 0 ? (
+            <button className="bild" onClick={() => setOpen(0)} aria-label="Bild vergrößern">
+              <img src={mediaUrl("content", content.id, "images", 0)} alt="Erzeugtes Bild" loading="lazy" />
+            </button>
+          ) : (
+            <div className={`bild leerbild${working ? " laedt" : ""}`} aria-hidden="true" />
+          )}
+          {content.hasFrame && (
+            <figure className="vorlage">
+              <img src={mediaUrl("content", content.id, "frame", 0)} alt="Erstes Bild der Vorlage" loading="lazy" />
+              <figcaption>Vorlage</figcaption>
+            </figure>
+          )}
+        </div>
+      ) : (
       <div className={`bilder n${Math.min(content.slotCount, 4)}`}>
         {Array.from({ length: content.slotCount }).map((_, i) =>
           i < content.imageCount ? (
@@ -126,11 +150,13 @@ function Tile({ content, model, onChanged }: { content: Content; model: string; 
           ),
         )}
       </div>
+      )}
       <div className="kachel-text">
         <h3>{content.title}</h3>
         <p className="leise klein">
           {model}
-          {working && `, ${content.imageCount} von ${content.slotCount} Bildern fertig`}
+          {stage && `, ${stage}`}
+          {working && !reel && `, ${content.imageCount} von ${content.slotCount} Bildern fertig`}
           {!working && content.type === "Carousel" && `, ${content.imageCount} Bilder`}
         </p>
         {content.error && <p className={`klein ${content.status === "Failed" ? "warnung" : "leise"}`}>{content.error}</p>}
@@ -138,7 +164,9 @@ function Tile({ content, model, onChanged }: { content: Content; model: string; 
       </div>
       <div className="aktionen">
         {content.status === "Review" && <>
-          <button className="knopf haupt schmal" disabled={busy} onClick={() => run(() => api.decideContent(content.id, "approve"))}>Freigeben</button>
+          <button className="knopf haupt schmal" disabled={busy} onClick={() => run(() => api.decideContent(content.id, "approve"))}>
+            {imageStep ? "Bild freigeben, Video erzeugen" : "Freigeben"}</button>
+          {imageStep && <button className="knopf schmal" disabled={busy} onClick={() => run(() => api.retryContent(content.id, true))}>Neues Bild</button>}
           <button className="knopf schmal" disabled={busy} onClick={() => run(() => api.decideContent(content.id, "reject"))}>Ablehnen</button>
         </>}
         {(content.status === "Failed" || (content.status === "Review" && missing > 0)) &&
@@ -177,7 +205,12 @@ function CreateDialog({ models, preset, onClose, onCreated }: {
   const niches = useSWR<Niche[]>(modelId ? `/models/${modelId}/niches` : null, fetcher);
   const approved = (niches.data ?? []).filter((n) => n.status === "Approved");
   const [nicheId, setNicheId] = useState("");
-  const [kind, setKind] = useState<"carousel" | "photos">("carousel");
+  const [kind, setKind] = useState<"carousel" | "photos" | "reels">("carousel");
+  const [links, setLinks] = useState("");
+  const [uploads, setUploads] = useState<{ name: string; url: string }[]>([]);
+  const [uploading, setUploading] = useState(false);
+  const [videoModel, setVideoModel] = useState<"kling-3.0" | "kling-2.6">("kling-3.0");
+  const sources = [...links.split("\n").map((l) => l.trim()).filter(Boolean), ...uploads.map((u) => u.url)];
   const [count, setCount] = useState(5);
   const [mode, setMode] = useState<PhotoMode>("niche");
   const [busy, setBusy] = useState(false);
@@ -192,7 +225,8 @@ function CreateDialog({ models, preset, onClose, onCreated }: {
     setBusy(true);
     setError("");
     try {
-      await api.createImages(chosen.id, { kind, count, mode });
+      if (kind === "reels") await api.createReels(chosen.id, sources, videoModel);
+      else await api.createImages(chosen.id, { kind, count, mode });
       onCreated();
     } catch (err) {
       setError((err as Error).message);
@@ -205,8 +239,10 @@ function CreateDialog({ models, preset, onClose, onCreated }: {
       onClose={onClose}
       footer={<>
         <button className="knopf still" onClick={onClose}>Abbrechen</button>
-        <button className="knopf haupt" form="content-form" disabled={busy || !chosen || !!noPhotos}>
-          {busy ? "Starte …" : kind === "carousel" ? `Carousel mit ${count} Bildern erzeugen` : count === 1 ? "Ein Foto erzeugen" : `${count} Fotos erzeugen`}
+        <button className="knopf haupt" form="content-form"
+          disabled={busy || uploading || !chosen || !!noPhotos || (kind === "reels" && (sources.length === 0 || sources.length > 10))}>
+          {busy ? "Starte …" : kind === "reels" ? (sources.length === 1 ? "Ein Reel starten" : `${sources.length} Reels starten`)
+            : kind === "carousel" ? `Carousel mit ${count} Bildern erzeugen` : count === 1 ? "Ein Foto erzeugen" : `${count} Fotos erzeugen`}
         </button>
       </>}>
       <form id="content-form" className="formular" onSubmit={start}>
@@ -223,21 +259,59 @@ function CreateDialog({ models, preset, onClose, onCreated }: {
         </div>
         {noPhotos && <div className="hinweis info">{model?.name} hat noch keine Referenzfotos.<Link className="knopf schmal" href={`/models/${modelId}`}>Fotos hochladen</Link></div>}
         {niches.data && approved.length === 0 && <div className="hinweis info">Gib zuerst eine Nische frei.<Link className="knopf schmal" href={`/models/${modelId}`}>Zu den Nischen</Link></div>}
-        <div className="zwei">
-          <label className="feld"><span>Was soll entstehen?</span>
-            <select value={kind} onChange={(e) => setKind(e.target.value as "carousel" | "photos")}>
-              <option value="carousel">Ein Carousel (ein Look, mehrere Posen)</option>
-              <option value="photos">Einzelne Fotos (jedes mit eigenem Look)</option>
-            </select></label>
-          <label className="feld"><span>{kind === "carousel" ? "Bilder im Carousel" : "Anzahl Fotos"}</span>
-            <select value={count} onChange={(e) => setCount(Number(e.target.value))}>
-              {Array.from({ length: 10 }, (_, i) => i + 1).map((n) => <option key={n} value={n}>{n}</option>)}
-            </select></label>
-        </div>
-        <label className="feld"><span>Art der Aufnahme</span>
-          <select value={mode} onChange={(e) => setMode(e.target.value as PhotoMode)}>
-            {MODES.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+        <label className="feld"><span>Was soll entstehen?</span>
+          <select value={kind} onChange={(e) => setKind(e.target.value as typeof kind)}>
+            <option value="carousel">Ein Carousel (ein Look, mehrere Posen)</option>
+            <option value="photos">Einzelne Fotos (jedes mit eigenem Look)</option>
+            <option value="reels">Motion-Reels (sie bewegt sich wie in einem Vorlage-Video)</option>
           </select></label>
+        {kind === "reels" ? <>
+          <label className="feld"><span>Links zu Vorlage-Videos</span>
+            <textarea rows={4} value={links} onChange={(e) => setLinks(e.target.value)}
+              placeholder={"Ein Link pro Zeile, z. B.\nhttps://www.instagram.com/reel/…"} />
+            <small>Höchstens zehn Vorlagen pro Durchgang, jede bis 30 Sekunden.</small></label>
+          <div className="feld"><span>Oder Videodateien hochladen</span>
+            <input type="file" accept="video/*" multiple disabled={uploading}
+              onChange={async (e) => {
+                const files = Array.from(e.target.files ?? []);
+                e.target.value = "";
+                setUploading(true);
+                setError("");
+                try {
+                  for (const file of files) {
+                    const { url } = await api.uploadVideo(file);
+                    setUploads((list) => [...list, { name: file.name, url }]);
+                  }
+                } catch (err) {
+                  setError((err as Error).message);
+                } finally {
+                  setUploading(false);
+                }
+              }} />
+            {uploading && <small>Lade hoch …</small>}
+            {uploads.length > 0 && <ul className="dateien">
+              {uploads.map((u, i) => <li key={u.url}>{u.name}
+                <button type="button" className="knopf still schmal" onClick={() => setUploads((list) => list.filter((_, k) => k !== i))}>Entfernen</button></li>)}
+            </ul>}
+          </div>
+          <label className="feld"><span>Video-Modell</span>
+            <select value={videoModel} onChange={(e) => setVideoModel(e.target.value as typeof videoModel)}>
+              <option value="kling-3.0">Kling 3.0 (kürzt Vorlagen auf 30 Sekunden)</option>
+              <option value="kling-2.6">Kling 2.6 (nimmt nur Vorlagen bis 30 Sekunden)</option>
+            </select></label>
+          {sources.length > 10 && <div className="hinweis info">Das sind {sources.length} Vorlagen. Höchstens zehn pro Durchgang.</div>}
+        </> : <>
+          <div className="zwei">
+            <label className="feld"><span>{kind === "carousel" ? "Bilder im Carousel" : "Anzahl Fotos"}</span>
+              <select value={count} onChange={(e) => setCount(Number(e.target.value))}>
+                {Array.from({ length: 10 }, (_, i) => i + 1).map((n) => <option key={n} value={n}>{n}</option>)}
+              </select></label>
+            <label className="feld"><span>Art der Aufnahme</span>
+              <select value={mode} onChange={(e) => setMode(e.target.value as PhotoMode)}>
+                {MODES.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+              </select></label>
+          </div>
+        </>}
         {error && <div className="hinweis fehler" role="alert">{error}</div>}
       </form>
     </Dialog>

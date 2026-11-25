@@ -345,3 +345,18 @@ dialog.fenster::backdrop { background: rgba(6, 4, 18, 0.6); backdrop-filter: blu
 @keyframes schimmer { from { background-position: 100% 0; } to { background-position: 0 0; } }
 @media (prefers-reduced-motion: reduce) { .leerbild.laedt { animation: none; } }
 img.gross { display: block; max-width: 100%; max-height: 68dvh; margin: 0 auto; border-radius: var(--r-klein); }
+
+/* --- Motion-Reels ----------------------------------------------------------- */
+.reel { position: relative; aspect-ratio: 9 / 13; background: rgba(0, 0, 0, 0.4); }
+.reel > .bild, .reel > video { width: 100%; height: 100%; display: block; object-fit: cover; }
+.reel > video { background: #000; }
+/* Das erste Bild der Vorlage liegt klein in der Ecke: so vergleichst du Pose und Ausschnitt. */
+.vorlage {
+  position: absolute; left: 10px; top: 10px; margin: 0; width: 26%; border-radius: 10px; overflow: hidden;
+  border: 1px solid var(--kante-hell); box-shadow: 0 8px 22px -8px rgba(0, 0, 0, 0.8);
+}
+.vorlage img { display: block; width: 100%; aspect-ratio: 9 / 16; object-fit: cover; }
+.vorlage figcaption { position: absolute; inset: auto 0 0 0; font-size: 0.7rem; text-align: center; padding: 2px; background: rgba(10, 8, 24, 0.8); }
+.dateien { margin: 0; padding: 0; list-style: none; display: grid; gap: 4px; }
+.dateien li { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 0.9rem; overflow-wrap: anywhere; }
+.feld input[type="file"] { padding: 9px; }

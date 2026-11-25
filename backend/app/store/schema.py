@@ -19,6 +19,7 @@ CONTENT_TYPES = ("Carousel", "Photo", "Reel")
 # Ein Zustand pro Content: in Arbeit -> wartet auf dich -> freigegeben/abgelehnt.
 CONTENT_STATUS = ("Working", "Review", "Approved", "Rejected", "Failed")
 CONTENT_STEPS = ("images", "frame", "image", "video")
+VIDEO_MODELS = ("kling-3.0", "kling-2.6")
 PHOTO_MODES = ("niche", "lifestyle", "story_daily", "story_me", "story_cta")
 
 TABLES = {
@@ -58,6 +59,12 @@ TABLES = {
         "error": ("Error", "long"),
         "prompt": ("Prompt", "long"),
         "images": ("Images", "attach"),
+        # Nur Reels: Vorlage, ihr erstes Bild und das fertige Video.
+        "sourceUrl": ("Source URL", "long"),
+        "sourceVideo": ("Source Video", "attach"),
+        "frame": ("Source Frame", "attach"),
+        "finalReel": ("Final Reel", "attach"),
+        "videoModel": ("Video Model", "select"),
         # Quittungen der Anbieter-Aufträge: je Platz Phase, Auftragsnummer, Ergebnis.
         "tasks": ("Tasks", "json"),
     },
@@ -75,6 +82,7 @@ SELECT_CHOICES = {
     (CONTENT, "status"): CONTENT_STATUS,
     (CONTENT, "step"): CONTENT_STEPS,
     (CONTENT, "mode"): PHOTO_MODES,
+    (CONTENT, "videoModel"): VIDEO_MODELS,
 }
 
 # Verknüpfungen: (Tabelle, Schlüssel) -> Zieltabelle

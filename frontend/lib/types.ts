@@ -57,7 +57,11 @@ export type Content = {
   status: ContentStatus;
   error: string;
   images: string[];
+  step: "images" | "frame" | "image" | "video";
   imageCount: number;
   slotCount: number;
+  hasFrame: boolean;
+  hasSource: boolean;
+  hasVideo: boolean;
   created: string;
 };
