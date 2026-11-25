@@ -25,6 +25,16 @@ OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY", "")
 KIE_API_KEY = os.getenv("KIE_API_KEY", "")
 MEDIA_PROVIDER = os.getenv("MEDIA_PROVIDER", "kie").strip().lower()
 PUBLIC_URL = os.getenv("PUBLIC_URL", "http://localhost:8000").rstrip("/")
+
+# Viral Content: Reels fremder Accounts lesen. HikerAPI hat Vorrang vor Apify.
+HIKERAPI_TOKEN = os.getenv("HIKERAPI_TOKEN", "")
+APIFY_TOKEN = os.getenv("APIFY_TOKEN", "")
+APIFY_REEL_ACTOR = os.getenv("APIFY_REEL_ACTOR", "apify~instagram-reel-scraper")
+VIRAL_NEWER_THAN = os.getenv("VIRAL_NEWER_THAN", "14 days")
+VIRAL_RESULTS_LIMIT = int(os.getenv("VIRAL_RESULTS_LIMIT", "20"))
+VIRAL_RETENTION_DAYS = int(os.getenv("VIRAL_RETENTION_DAYS", "7"))
+# Alle wie viele Stunden von selbst neu gelesen wird (0 = nur von Hand).
+VIRAL_AUTO_HOURS = int(os.getenv("VIRAL_AUTO_HOURS", "48"))
 CREATIVE_MODEL = os.getenv("CREATIVE_MODEL", "openai/gpt-4o")
 
 _VAR = Path(__file__).resolve().parent.parent / "var"
@@ -53,6 +63,7 @@ VIDEO_WAIT_SECONDS = 20 * 60
 FFMPEG_BIN = os.getenv("FFMPEG_BIN", "ffmpeg")
 FFPROBE_BIN = os.getenv("FFPROBE_BIN", "ffprobe")
 MAX_REELS_PER_REQUEST = 10
+MAX_VIRAL_IMPORT = 30  # Reels, die ein Import höchstens startet (Vorlagen mal Varianten)
 MAX_SOURCE_BYTES = 200 * 1024 * 1024
 MAX_SOURCE_SECONDS = 30
 # Nur für Tests und den Platzhalter-Anbieter: Vorlagen von lokalen Adressen erlauben.

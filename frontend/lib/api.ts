@@ -1,4 +1,4 @@
-import type { Content, Job, Model, Niche, NicheSpec, NicheStatus, PhotoMode } from "./types";
+import type { Content, Job, Model, Niche, NicheSpec, NicheStatus, PhotoMode, Source } from "./types";
 
 export class ApiError extends Error {
   constructor(public status: number, message: string) {
@@ -53,6 +53,14 @@ export const api = {
   retryContent: (id: string, freshImage = false) => req<Content>(`/content/${id}/retry`, post({ freshImage })),
   createReels: (nicheId: string, sources: string[], videoModel: "kling-3.0" | "kling-2.6") =>
     req<Content[]>(`/niches/${nicheId}/content/reels`, post({ sources, videoModel })),
+  addSources: (handles: string[], market: "DE" | "US", category: string) =>
+    req<{ created: Source[]; skipped: string[] }>("/viral/sources", post({ handles, market, category })),
+  updateSource: (id: string, body: Partial<Pick<Source, "state" | "market" | "category">>) => req<Source>(`/viral/sources/${id}`, patch(body)),
+  deleteSource: (id: string) => req<void>(`/viral/sources/${id}`, { method: "DELETE" }),
+  scrapeViral: () => req<Job>("/viral/scrape", post()),
+  setViralStatus: (id: string, status: "New" | "Dismissed") => req<unknown>(`/viral/reels/${id}/status`, post({ status })),
+  importViral: (viralIds: string[], nicheId: string, variants: number, videoModel: "kling-3.0" | "kling-2.6") =>
+    req<{ count: number }>("/viral/import", post({ viralIds, nicheId, variants, videoModel })),
   uploadVideo: (file: File) => {
     const form = new FormData();
     form.append("file", file);

@@ -23,8 +23,26 @@ from .images import UNCERTAIN, ContentError
 VIDEO_PROMPT = "Create a high-quality, cinematic video."
 
 
-def create(niche_id, sources, video_model="kling-3.0"):
-    """sources: Liste von Adressen (Video-Links oder schon hochgeladene Dateien)."""
+# Mehrere Fassungen derselben Vorlage (für mehrere Accounts): gleiche Pose, kleine
+# Unterschiede in Licht und Stoff, damit keine zwei Accounts dasselbe Bild posten.
+VARIANTS = (
+    "Use neutral natural light with subtle fabric texture variation.",
+    "Use subtly warmer natural light with small fabric fold differences.",
+    "Use subtly cooler natural light with small fabric fold differences.",
+)
+VARIANT_RULES = (
+    " Generate this account image independently from the references. {variation}"
+    " These small variations must NOT change the source pose, gesture, camera angle, crop,"
+    " subject placement or scene geometry. Keep the source framing 1:1; do not invent a new composition."
+    " Preserve visible props, animals, furniture positions and interactions with them. Do not add unrelated props."
+    " Change identity to the model in references 2 onward. Niche styling may change clothing and scene appearance,"
+    " but the first reference remains the strict spatial template. No collage or duplicate panels."
+)
+
+
+def create(niche_id, sources, video_model="kling-3.0", label="", as_variants=False):
+    """sources: Liste von Adressen (Video-Links oder schon hochgeladene Dateien).
+    as_variants: die Einträge sind Fassungen derselben Vorlage."""
     sources = [s.strip() for s in sources if s and s.strip()]
     if not 1 <= len(sources) <= settings.MAX_REELS_PER_REQUEST:
         raise ContentError(f"Zwischen 1 und {settings.MAX_REELS_PER_REQUEST} Vorlagen pro Auftrag")
@@ -46,10 +64,11 @@ def create(niche_id, sources, video_model="kling-3.0"):
     created = []
     for offset, source in enumerate(sources):
         record = store.create(CONTENT, {
-            "title": f"Reel {number + offset}: {niche['name']}", "modelId": model["id"], "nicheId": niche["id"],
+            "title": f"Reel {number + offset}: {niche['name']}" + (f" ({label})" if label else ""), "modelId": model["id"], "nicheId": niche["id"],
             "type": "Reel", "status": "Working", "step": "frame", "error": "", "images": [], "prompt": "",
             "sourceUrl": source, "sourceVideo": [], "frame": [], "finalReel": [], "videoModel": video_model,
-            "tasks": {"image": {"phase": "new"}, "video": {"phase": "new"}},
+            "tasks": {"image": {"phase": "new"}, "video": {"phase": "new"},
+                      "variant": offset % len(VARIANTS) if as_variants else None},
         })
         jobs.start("reel_image", {"contentId": record["id"]}, subject=record["id"])
         created.append(record)
@@ -120,10 +139,12 @@ def _prepare(content, tasks):
     return get_store().update(CONTENT, content["id"], {"frame": [frame_url], "sourceVideo": [kept_url], "tasks": tasks, "step": "image"})
 
 
-def _image_prompt(niche, model):
+def _image_prompt(niche, model, variant=None):
     outfits = prompts.varied_outfits(niche.get("outfits"), niche.get("nsfwLevel"))
     backgrounds = [b for b in (niche.get("backgrounds") or []) if b]
     text = prompts.build_motion_image_prompt(outfit=random.choice(outfits), background=random.choice(backgrounds) if backgrounds else None)
+    if variant is not None:
+        text += VARIANT_RULES.format(variation=VARIANTS[variant])
     text += prompts.body_clause(model.get("bodyType"))
     text += prompts.market_cue(prompts.effective_market(niche.get("market"), model.get("language")), random.randint(0, 999))
     if niche.get("dressCode") == "authentic":
@@ -151,7 +172,7 @@ def run_image(payload):
         if not receipt.get("taskId") and not receipt.get("url"):
             niche = store.get(NICHES, content["nicheId"])
             model = store.get(MODELS, content["modelId"])
-            prompt = _image_prompt(niche, model)
+            prompt = _image_prompt(niche, model, tasks.get("variant"))
             # Reihenfolge der Vorlagen: zuerst das Bild aus dem Video (nur Pose), dann ihr Gesicht.
             references = list(content["frame"]) + list(model.get("referenceImages") or [])[:4]
             store.update(CONTENT, content["id"], {"prompt": prompt, "step": "image"})

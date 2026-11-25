@@ -103,7 +103,7 @@ class AirtableStore:
                         row[key].append(a["url"])
                         if a.get("id"):
                             self._attachment_ids[a["url"]] = a["id"]
-            elif kind == "number":
+            elif kind in ("number", "decimal"):
                 row[key] = raw or 0
             else:
                 row[key] = raw or ""

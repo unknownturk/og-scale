@@ -65,3 +65,25 @@ export type Content = {
   hasVideo: boolean;
   created: string;
 };
+
+export type Source = { id: string; handle: string; market: "DE" | "US"; category: string; state: "Active" | "Disabled"; lastScraped: string };
+
+export type ViralReel = {
+  id: string;
+  reelUrl: string;
+  owner: string;
+  market: "DE" | "US";
+  category: string;
+  caption: string;
+  likes: number;
+  comments: number;
+  views: number;
+  postedAt: string;
+  viralScore: number;
+  outperform: number;
+  potential: number;
+  status: "New" | "Imported" | "Dismissed";
+};
+
+export type ViralStatus = { provider: string | null; lastScrape: string; running: boolean; jobId: string | null; autoHours: number };
+export type ScrapeResult = { created: number; found: number; sources: number; sourcesWithReels: number; errors: string[]; removed: number };

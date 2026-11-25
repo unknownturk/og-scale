@@ -16,7 +16,8 @@ export function Shell({ children }: { children: React.ReactNode }) {
       <aside className="leiste">
         <div className="marke">OG <span>Scale</span></div>
         <nav aria-label="Bereiche">
-          <Link href="/" aria-current={onModels ? "page" : undefined}>Models &amp; Nischen</Link>
+          <Link href="/" aria-current={onModels ? "page" : undefined}><span className="lang">Models &amp; Nischen</span><span className="kurz">Models</span></Link>
+          <Link href="/viral" aria-current={path.startsWith("/viral") ? "page" : undefined}>Viral</Link>
           <Link href="/content" aria-current={path.startsWith("/content") ? "page" : undefined}>Content</Link>
           <span className="bald">AliRemote <em>in Arbeit</em></span>
         </nav>

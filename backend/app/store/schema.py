@@ -1,13 +1,15 @@
 """Tabellen und Felder — die eine Quelle für Speicher, Airtable-Schema und API.
 
 Jede Tabelle: app-Schlüssel -> (Airtable-Feldname, Art).
-Arten: text, long, json, select, number, link (ein verknüpfter Datensatz),
+Arten: text, long, json, select, number (ganz), decimal (eine Nachkommastelle), link (ein verknüpfter Datensatz),
 attach (Liste von Datei-Adressen; Airtable speichert die Dateien dauerhaft).
 """
 
 MODELS = "Models"
 NICHES = "Niches"
 CONTENT = "Content"
+SOURCES = "Sources"
+VIRAL = "Viral Reels"
 
 NICHE_STATUS = ("Proposed", "Approved", "Rejected")
 NICHE_SOURCE = ("AI", "Brief", "Manual")
@@ -19,6 +21,8 @@ CONTENT_TYPES = ("Carousel", "Photo", "Reel")
 # Ein Zustand pro Content: in Arbeit -> wartet auf dich -> freigegeben/abgelehnt.
 CONTENT_STATUS = ("Working", "Review", "Approved", "Rejected", "Failed")
 CONTENT_STEPS = ("images", "frame", "image", "video")
+SOURCE_STATE = ("Active", "Disabled")
+VIRAL_STATUS = ("New", "Imported", "Dismissed")
 VIDEO_MODELS = ("kling-3.0", "kling-2.6")
 PHOTO_MODES = ("niche", "lifestyle", "story_daily", "story_me", "story_cta")
 
@@ -68,6 +72,33 @@ TABLES = {
         # Quittungen der Anbieter-Aufträge: je Platz Phase, Auftragsnummer, Ergebnis.
         "tasks": ("Tasks", "json"),
     },
+    # Viral Content: beobachtete Instagram-Accounts und ihre Reels.
+    SOURCES: {
+        "handle": ("Handle", "text"),
+        "market": ("Market", "select"),
+        "category": ("Category", "text"),
+        "state": ("State", "select"),
+        "lastScraped": ("Last Scraped", "text"),
+    },
+    VIRAL: {
+        "reelUrl": ("Reel URL", "text"),
+        "owner": ("Owner", "text"),
+        "market": ("Market", "select"),
+        "category": ("Category", "text"),
+        "videoUrl": ("Video URL", "long"),
+        "thumbnail": ("Thumbnail", "long"),
+        "caption": ("Caption", "long"),
+        "likes": ("Likes", "number"),
+        "comments": ("Comments", "number"),
+        "views": ("Views", "number"),
+        "postedAt": ("Posted At", "text"),
+        "scrapedAt": ("Scraped At", "text"),
+        "viralScore": ("Views per Hour", "decimal"),
+        "outperform": ("Outperform", "decimal"),
+        "potential": ("Potential", "number"),
+        "status": ("Status", "select"),
+        "importedContent": ("Imported Content", "json"),
+    },
 }
 
 SELECT_CHOICES = {
@@ -83,6 +114,10 @@ SELECT_CHOICES = {
     (CONTENT, "step"): CONTENT_STEPS,
     (CONTENT, "mode"): PHOTO_MODES,
     (CONTENT, "videoModel"): VIDEO_MODELS,
+    (SOURCES, "market"): MARKETS,
+    (SOURCES, "state"): SOURCE_STATE,
+    (VIRAL, "market"): MARKETS,
+    (VIRAL, "status"): VIRAL_STATUS,
 }
 
 # Verknüpfungen: (Tabelle, Schlüssel) -> Zieltabelle

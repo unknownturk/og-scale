@@ -21,6 +21,8 @@ def _field(table, key, name, kind, table_ids):
         return [{"name": name, "type": "singleLineText"}]
     if kind in ("long", "json"):
         return [{"name": name, "type": "multilineText"}]
+    if kind == "decimal":
+        return [{"name": name, "type": "number", "options": {"precision": 1}}]
     if kind == "number":
         return [{"name": name, "type": "number", "options": {"precision": 0}}]
     if kind == "select":

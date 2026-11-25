@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-OG Scale: Nischen, Content, AliRemote. Ein Nutzer. Siehe @README.md.
+OG Scale: Nischen, Content (mit Viral als Vorlagen-Quelle), AliRemote. Ein Nutzer. Siehe @README.md.
 
 ## Regeln
 
