@@ -25,6 +25,12 @@ HikerAPI, Apify und AliRemote sind nur gegen nachgestellte Antworten getestet.
 Mit `MEDIA_PROVIDER=fake` läuft alles kostenlos mit Platzhaltern und
 nachgestellten Handys.
 
+## Ausprobieren ohne Zugänge
+
+`./demo.sh` (Mac/Linux) oder `demo.bat` (Windows) richtet alles ein und startet
+den Testbetrieb unter http://localhost:3000 (Passwort `demo`). Braucht
+Python 3.11+, Node 20+ und ffmpeg. `demo.bat` ist ungetestet.
+
 ## Einrichten für den echten Betrieb
 
 Backend (`backend/.env` oder Umgebung des Servers):
